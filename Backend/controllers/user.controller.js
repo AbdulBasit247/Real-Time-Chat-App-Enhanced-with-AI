@@ -6,8 +6,6 @@ import redisClient from '../services/redis.service.js';
 
 export const createUserController = async (req, res) => {
 
-    const {email, password} = req.body;
-
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -16,6 +14,8 @@ export const createUserController = async (req, res) => {
 
     try {
         
+        const { email, password } = req.body;
+
         const user = await userService.createUser({ email, password });
 
         const token = await user.generateJWT();
@@ -77,20 +77,44 @@ export const profileController = async (req, res) => {
 }
 
 export const logoutController = async (req, res) => {
-    try {
 
+    try {
         const token = req.cookies.token || req.headers.authorization.split(' ')[ 1 ];
 
         redisClient.set(token, 'logout', 'EX', 60 * 60 * 24);
+
+        res.clearCookie('token');
 
         return res.status(200).json({
             message: 'Logged out successfully'
         });
 
-
     } catch (err) {
-        
+
         console.log(err);
         return res.status(400).send(err.message);
+    }
+}
+
+export const getAllUsersController = async (req, res) => {
+    
+    try {
+
+        const loggedInUser = await userModel.findOne({
+            email: req.user.email
+        })
+
+        const allUsers = await userService.getAllUsers({ userId: loggedInUser._id });
+
+        return res.status(200).json({
+            users: allUsers
+        })
+
+    } catch (err) {
+
+        console.log(err)
+
+        res.status(400).json({ error: err.message })
+
     }
 }
