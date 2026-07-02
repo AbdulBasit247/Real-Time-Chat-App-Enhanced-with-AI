@@ -8,7 +8,7 @@ const App = () => {
       <Toaster
         position="top-right"
         richColors
-        duration={4000}
+        duration={2000}
       />
       <AppRoutes />
     </UserProvider>

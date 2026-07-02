@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from "../config/axios"
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 const Home = () => {
 
@@ -9,6 +10,21 @@ const Home = () => {
     const [ project, setProject ] = useState([])
 
     const navigate = useNavigate()
+
+    const handleLogout = () => {
+        axios.get('/api/users/logout')
+        .then((res) => {
+            console.log(res)
+            localStorage.removeItem('token')
+            navigate('/login')
+            toast.success('Logged out successfully!')
+        })
+        .catch((err) => {
+            toast.error('Logout failed. Please try again.')
+            console.log(err)
+        })
+ 
+    }
 
     function createProject(e) {
         e.preventDefault()
@@ -22,22 +38,38 @@ const Home = () => {
                 setIsModalOpen(false)
             })
             .catch((error) => {
+                toast.error('Failed to create project. Please try again.')
                 console.log(error)
+            })
+            .finally(() => {
+                setProjectName("")
             })
     }
 
     useEffect(() => {
         axios.get('/api/projects/all').then((res) => {
             setProject(res.data.projects)
-
         }).catch(err => {
             console.log(err)
         })
-
-    }, [])
+        .finally(() => {
+            console.log('Fetch projects attempt completed.', { project })
+        })
+    }, [project])
 
     return (
         <main className='p-4'>
+
+            {/* --- Logout Button (Top Left) --- */}
+            <div className="absolute top-4 right-4">
+                <button 
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md shadow transition-all"
+                >
+                    <i className="ri-logout-box-r-line"></i> Logout
+                </button>
+            </div>
+
             <div className="projects flex flex-wrap gap-3">
                 <button
                     onClick={() => setIsModalOpen(true)}
