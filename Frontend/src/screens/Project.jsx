@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "../config/axios";
+import { initializeSocket, receiveMessage, sendMessage } from '../config/socket'
 
 const Project = () => {
 
@@ -35,6 +36,9 @@ const Project = () => {
   }
 
   useEffect(() => {
+
+    initializeSocket();
+
     if (project._id) {
       axios
         .get(`/api/projects/get-project/${project._id}`)
@@ -45,7 +49,6 @@ const Project = () => {
         console.log(err);
       });
     }
-
     
     axios
       .get("/api/users/all")

@@ -23,7 +23,6 @@ const Home = () => {
             toast.error('Logout failed. Please try again.')
             console.log(err)
         })
- 
     }
 
     function createProject(e) {
@@ -51,9 +50,6 @@ const Home = () => {
             setProject(res.data.projects)
         }).catch(err => {
             console.log(err)
-        })
-        .finally(() => {
-            console.log('Fetch projects attempt completed.', { project })
         })
     }, [project])
 
